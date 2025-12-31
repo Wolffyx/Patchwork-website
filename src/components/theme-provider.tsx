@@ -44,8 +44,19 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
+
+    // Add no-transitions class to prevent flash on initial load
+    root.classList.add("no-transitions");
+
     root.classList.remove("light", "dark");
     root.classList.add(resolvedTheme);
+
+    // Remove no-transitions class after a brief delay
+    const timeout = setTimeout(() => {
+      root.classList.remove("no-transitions");
+    }, 50);
+
+    return () => clearTimeout(timeout);
   }, [resolvedTheme]);
 
   const setTheme = (newTheme: Theme) => {
