@@ -1,10 +1,16 @@
+import { AICapabilities } from "@/components/AICapabilities";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground">Patchwork</h1>
-        <p className="mt-4 text-muted-foreground">Website coming soon...</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <h1 className="text-2xl font-bold text-foreground">Patchwork</h1>
+        </div>
+      </header>
+      <main>
+        <AICapabilities />
+      </main>
     </div>
   );
 }
