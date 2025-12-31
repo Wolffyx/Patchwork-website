@@ -111,6 +111,6 @@ Continue from where you left off. Focus on the next logical step.
 
 
 ## Error
-AI execution failed: spawn codex ENOENT
+AI execution failed: spawn EINVAL
 
 Please implement the changes manually following the plan above.
