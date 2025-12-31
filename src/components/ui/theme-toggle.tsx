@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
   return (
     <div
-      className="flex items-center gap-1 rounded-full bg-secondary p-1"
+      className="flex items-center gap-0.5 rounded-full bg-secondary p-1"
       role="radiogroup"
       aria-label="Theme selection"
     >
@@ -23,19 +23,25 @@ export function ThemeToggle() {
           key={value}
           onClick={() => setTheme(value)}
           className={cn(
-            "rounded-full p-2 transition-all duration-200",
-            "hover:bg-accent hover:text-accent-foreground",
+            "relative rounded-full p-2 transition-all duration-200 ease-out",
+            "hover:text-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             theme === value
               ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground"
+              : "text-muted-foreground hover:bg-accent/50"
           )}
           role="radio"
           aria-checked={theme === value}
           aria-label={label}
           title={label}
         >
-          <Icon className="h-4 w-4" aria-hidden="true" />
+          <Icon
+            className={cn(
+              "h-4 w-4 transition-transform duration-200",
+              theme === value && "scale-110"
+            )}
+            aria-hidden="true"
+          />
         </button>
       ))}
     </div>
