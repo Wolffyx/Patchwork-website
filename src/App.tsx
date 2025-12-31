@@ -1,6 +1,8 @@
+
+import { FeaturesShowcase } from "@/components/FeaturesShowcase";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-
+     
 function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -30,7 +32,7 @@ function App() {
               Features
             </h2>
             <p className="mt-4 text-muted-foreground text-center max-w-2xl mx-auto">
-              Discover what makes Patchwork powerful.
+                 <FeaturesShowcase />
             </p>
           </div>
         </section>
