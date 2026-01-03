@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Menu, X, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface NavLinkProps {
   href: string;
@@ -89,6 +90,7 @@ export function Navigation() {
                 )}
               </NavLink>
             ))}
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
@@ -111,7 +113,7 @@ export function Navigation() {
         <div
           className={cn(
             "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isMenuOpen ? "max-h-64 pb-4" : "max-h-0"
+            isMenuOpen ? "max-h-80 pb-4" : "max-h-0"
           )}
         >
           <div className="flex flex-col space-y-4 pt-4">
@@ -132,6 +134,9 @@ export function Navigation() {
                 )}
               </NavLink>
             ))}
+            <div className="pt-2">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </nav>
