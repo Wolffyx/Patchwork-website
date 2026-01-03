@@ -1,36 +1,89 @@
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AICapabilities } from "@/components/AICapabilities";
+import { DownloadSection } from "@/components/DownloadSection";
+import { FeaturesShowcase } from "@/components/FeaturesShowcase";
+import { Footer } from "@/components/Footer";
+import { Hero } from "@/components/Hero";
+import { Navigation } from "@/components/Navigation";
+import { WorkflowSection } from "@/components/WorkflowSection";
+import {
+  TestimonialsSection,
+  UseCasesSection,
+} from "@/components";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border/50 bg-background/80 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 sm:px-6 lg:px-8 sm:py-4">
-        <div className="text-lg font-semibold tracking-tight text-foreground select-none sm:text-xl">
-          <span className="text-primary">Patch</span>work
-        </div>
-        <ThemeToggle />
-      </header>
-      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <div className="max-w-3xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-            <span className="text-primary">Patch</span>work
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground sm:mt-8 sm:text-xl md:text-2xl max-w-2xl mx-auto">
-            Website coming soon...
-          </p>
-          <div className="mt-10 sm:mt-12">
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm font-medium text-accent-foreground ring-1 ring-accent/30">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
-              </span>
-              Under Development
-            </span>
+      <Navigation />
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <Hero />
+
+        {/* Workflow Demonstration Section */}
+        <section
+          id="workflow"
+          className="border-t border-border scroll-mt-16"
+        >
+          <WorkflowSection />
+        </section>
+
+        {/* Features Section */}
+        <section
+          id="features"
+          className="py-20 border-t border-border scroll-mt-16"
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-foreground text-center">
+              Features
+            </h2>
+            <p className="mt-4 text-muted-foreground text-center max-w-2xl mx-auto">
+                 <FeaturesShowcase />
+            </p>
           </div>
-        </div>
+        </section>
+
+        {/* AI Capabilities Section */}
+        <AICapabilities />
+
+        {/* Use Cases Section */}
+        <section
+          id="use-cases"
+          className="py-20 border-t border-border scroll-mt-16"
+        >
+          <UseCasesSection />
+        </section>
+
+        {/* Testimonials Section */}
+        <section
+          id="testimonials"
+          className="py-20 border-t border-border scroll-mt-16"
+        >
+          <TestimonialsSection />
+        </section>
+
+        {/* Docs Section */}
+        <section id="docs" className="py-20 border-t border-border scroll-mt-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-foreground text-center">
+              Documentation
+            </h2>
+            <p className="mt-4 text-muted-foreground text-center max-w-2xl mx-auto">
+              Learn how to get started with Patchwork.
+            </p>
+          </div>
+        </section>
+
+        {/* Download Section */}
+        <section
+          id="download"
+          className="border-t border-border scroll-mt-16"
+        >
+          <DownloadSection />
+        </section>
       </main>
-      <footer className="border-t border-border/50 bg-muted/30 px-4 py-4 text-center text-sm text-muted-foreground sm:px-6 lg:px-8 sm:py-5">
-        <p>&copy; {new Date().getFullYear()} Patchwork. All rights reserved.</p>
-      </footer>
+
+      <Footer />
     </div>
   );
 }
