@@ -1,3 +1,4 @@
+import { AICapabilities } from "@/components/AICapabilities";
 import { DownloadSection } from "@/components/DownloadSection";
 import { FeaturesShowcase } from "@/components/FeaturesShowcase";
 import { Footer } from "@/components/Footer";
@@ -41,6 +42,9 @@ function App() {
             </p>
           </div>
         </section>
+
+        {/* AI Capabilities Section */}
+        <AICapabilities />
 
         {/* Use Cases Section */}
         <section
