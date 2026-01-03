@@ -1,8 +1,8 @@
-
+import { DownloadSection } from "@/components/DownloadSection";
 import { FeaturesShowcase } from "@/components/FeaturesShowcase";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-     
+
 function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -52,16 +52,9 @@ function App() {
         {/* Download Section */}
         <section
           id="download"
-          className="py-20 border-t border-border scroll-mt-16"
+          className="border-t border-border scroll-mt-16"
         >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-foreground text-center">
-              Download
-            </h2>
-            <p className="mt-4 text-muted-foreground text-center max-w-2xl mx-auto">
-              Get Patchwork for your platform.
-            </p>
-          </div>
+          <DownloadSection />
         </section>
       </main>
 
