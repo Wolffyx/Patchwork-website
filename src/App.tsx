@@ -1,7 +1,8 @@
 import { DownloadSection } from "@/components/DownloadSection";
 import { FeaturesShowcase } from "@/components/FeaturesShowcase";
-import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { Hero } from "@/components/Hero";
+import { Navigation } from "@/components/Navigation";
 
 function App() {
   return (
@@ -11,16 +12,7 @@ function App() {
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="flex items-center justify-center min-h-[calc(100vh-4rem)] py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground">
-              Patchwork
-            </h1>
-            <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Website coming soon...
-            </p>
-          </div>
-        </section>
+        <Hero />
 
         {/* Features Section */}
         <section
