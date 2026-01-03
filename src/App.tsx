@@ -4,6 +4,10 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Navigation } from "@/components/Navigation";
 import { WorkflowSection } from "@/components/WorkflowSection";
+import {
+  TestimonialsSection,
+  UseCasesSection,
+} from "@/components";
 
 function App() {
   return (
@@ -36,6 +40,22 @@ function App() {
                  <FeaturesShowcase />
             </p>
           </div>
+        </section>
+
+        {/* Use Cases Section */}
+        <section
+          id="use-cases"
+          className="py-20 border-t border-border scroll-mt-16"
+        >
+          <UseCasesSection />
+        </section>
+
+        {/* Testimonials Section */}
+        <section
+          id="testimonials"
+          className="py-20 border-t border-border scroll-mt-16"
+        >
+          <TestimonialsSection />
         </section>
 
         {/* Docs Section */}
