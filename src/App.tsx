@@ -3,6 +3,7 @@ import { FeaturesShowcase } from "@/components/FeaturesShowcase";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Navigation } from "@/components/Navigation";
+import { WorkflowSection } from "@/components/WorkflowSection";
 
 function App() {
   return (
@@ -13,6 +14,14 @@ function App() {
       <main className="flex-1">
         {/* Hero Section */}
         <Hero />
+
+        {/* Workflow Demonstration Section */}
+        <section
+          id="workflow"
+          className="border-t border-border scroll-mt-16"
+        >
+          <WorkflowSection />
+        </section>
 
         {/* Features Section */}
         <section
