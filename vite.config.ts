@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/Patchwork-website/",
+  base: "/flowpatch-website/",
   plugins: [react()],
   resolve: {
     alias: {
