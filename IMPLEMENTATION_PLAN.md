@@ -1,49 +1,121 @@
-# Implementation Plan (AI execution failed)
+# Implementation Plan (AI execution unavailable)
 
 ## Task
-Build navigation and footer
+[WIP] Fix download buttons with the right repo release
 
 ## Description
-Create consistent site-wide navigation header and footer components.
+## Summary
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+## Plan
+# Implementation Plan (Lite)
+
+## Task
+Fix download buttons with the right repo release
+
+## Description
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
+
+## Approach
+1. Analyze the requirements
+2. Identify files to modify
+3. Implement changes
+4. Run verification commands
+5. Commit and push
+
+## Commands to Run
+- pnpm install
+- pnpm lint
+- pnpm test
+- pnpm build
+
+## Testing
+Some checks failed - needs review
+
+---
+Closes #23
+
+_Automated by FlowPatch_
 
 ## Plan
 # Task: Implement the following issue
 
 ## Issue Title
-Build navigation and footer
+[WIP] Fix download buttons with the right repo release
 
 ## Issue Description
-Create consistent site-wide navigation header and footer components.
+## Summary
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+## Plan
+# Implementation Plan (Lite)
+
+## Task
+Fix download buttons with the right repo release
+
+## Description
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
+
+## Approach
+1. Analyze the requirements
+2. Identify files to modify
+3. Implement changes
+4. Run verification commands
+5. Commit and push
+
+## Commands to Run
+- pnpm install
+- pnpm lint
+- pnpm test
+- pnpm build
+
+## Testing
+Some checks failed - needs review
+
+---
+Closes #23
+
+_Automated by FlowPatch_
 
 ## Implementation Plan
 # Implementation Plan (Lite)
 
 ## Task
-Build navigation and footer
+[WIP] Fix download buttons with the right repo release
 
 ## Description
-Create consistent site-wide navigation header and footer components.
+## Summary
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+## Plan
+# Implementation Plan (Lite)
+
+## Task
+Fix download buttons with the right repo release
+
+## Description
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
+
+## Approach
+1. Analyze the requirements
+2. Identify files to modify
+3. Implement changes
+4. Run verification commands
+5. Commit and push
+
+## Commands to Run
+- pnpm install
+- pnpm lint
+- pnpm test
+- pnpm build
+
+## Testing
+Some checks failed - needs review
+
+---
+Closes #23
+
+_Automated by FlowPatch_
 
 ## Approach
 1. Analyze the requirements
@@ -61,7 +133,7 @@ Create consistent site-wide navigation header and footer components.
 ## Important Constraints
 - Only use these commands: pnpm install, pnpm lint, pnpm test, pnpm build
 - Do NOT modify these paths: .github/workflows/, .gitlab-ci.yml
-- Working directory: D:\Projects\Typescript\React\Patchwork-website-worktrees\github-4-build-navigation-and-footer
+- Working directory: D:\Projects\Typescript\React\Patchwork-website-worktrees\github-24-wip-fix-download-buttons-with-the-right-repo-relea
 - Repo root: D:\Projects\Typescript\React\Patchwork-website
 - After implementation, run the verification commands if they exist
 
@@ -70,38 +142,25 @@ Create consistent site-wide navigation header and footer components.
 - Test: pnpm test
 - Build: pnpm build
 
-## Project Memory (from .patchwork)
+## Project Memory (from .flowpatch)
 ### AGENTS.md (top)
-# Patchwork Agent Notes
+# FlowPatch Agent Notes
 
 - Where things live:
 - Commands:
 - When asked X check Y:
-
 ### ARCHITECTURE.md (top)
 # Architecture
 
-
 ### Suggested files (from local index)
 (none)
-
 ### Snippets (bounded, may be redacted)
 (none)
 
 Please implement the changes now.
 
 ## Iteration Context
-This is iteration 5 of 5.
-
-### Previous Progress
-Files modified:
-IMPLEMENTATION_PLAN.md
-
-Change summary:
-IMPLEMENTATION_PLAN.md | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-Continue from where you left off. Focus on the next logical step.
+This is iteration 1 of 5.
 
 ### Iteration Guidelines
 - Focus on making incremental progress
@@ -110,7 +169,7 @@ Continue from where you left off. Focus on the next logical step.
 - If you complete the current subtask, move to the next one
 
 
-## Error
-AI execution failed: spawn EINVAL
+## Note
+All AI providers failed. Tried: codex. Last error: spawn _prog=%dp0%\node.exe ENOENT
 
 Please implement the changes manually following the plan above.
