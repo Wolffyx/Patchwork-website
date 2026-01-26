@@ -16,7 +16,7 @@ Fix download buttons with the right repo release
 I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
 ## Implementation Plan
-# Implementation Plan (Lite)
+# Implementation Specification (Spec)
 
 ## Task
 Fix download buttons with the right repo release
@@ -24,18 +24,44 @@ Fix download buttons with the right repo release
 ## Description
 I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
-## Approach
-1. Analyze the requirements
-2. Identify files to modify
-3. Implement changes
-4. Run verification commands
-5. Commit and push
+## Analysis Requirements
+Before implementing, analyze the following:
+1. Identify all files that need to be modified
+2. List any new files that need to be created
+3. Check for existing patterns in the codebase to follow
+4. Identify any dependencies or related components
 
-## Commands to Run
+## Implementation Steps
+1. **Preparation**
+   - Review existing code structure
+   - Identify integration points
+
+2. **Core Changes**
+   - Implement the main functionality
+   - Follow existing code patterns and conventions
+
+3. **Integration**
+   - Wire up new components
+   - Update any necessary imports/exports
+
+4. **Testing**
+   - Add or update tests as needed
+   - Verify existing tests still pass
+
+## Verification
+- Lint: `pnpm lint`
+- Test: `pnpm test`
+- Build: `pnpm build`
+
+## Allowed Commands
 - pnpm install
 - pnpm lint
 - pnpm test
 - pnpm build
+
+## Forbidden Paths
+- .github/workflows/
+- .gitlab-ci.yml
 
 ## Important Constraints
 - Only use these commands: pnpm install, pnpm lint, pnpm test, pnpm build
@@ -67,7 +93,7 @@ I would like to change the repo download to the repo app itself, the files are i
 Please implement the changes now.
 
 ## Iteration Context
-This is iteration 5 of 5.
+This is iteration 0 of 5.
 
 ### Previous Progress
 Files modified:
@@ -87,6 +113,9 @@ Continue from where you left off. Focus on the next logical step.
 
 
 ## Note
-All AI providers failed. Tried: claude, codex. Last error: spawn D:\Projects\Typescript\React\Patchwork\node_modules\.bin\node.exe ENOENT
+All AI providers failed. Tried: claude. Last error: Error: claude exited with code 1
+
+--- stdout (tail) ---
+You've hit your limit · resets 7pm (Europe/Bucharest)
 
 Please implement the changes manually following the plan above.
