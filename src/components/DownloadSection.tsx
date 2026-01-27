@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Download, Apple, Monitor, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,34 +7,33 @@ type Platform = "macos" | "windows" | "linux" | "unknown";
 interface PlatformInfo {
   name: string;
   icon: React.ReactNode;
-  downloadUrl: string;
-  fileName: string;
   requirements: string[];
 }
 
-const VERSION = "1.0.0";
-const GITHUB_RELEASES_URL = "https://github.com/patchwork-project/patchwork/releases";
+interface PlatformDownload {
+  downloadUrl: string;
+  fileName: string;
+}
+
+const REPO_OWNER = "Wolffyx";
+const REPO_NAME = "flowpatch";
+const GITHUB_RELEASES_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
+const GITHUB_API_LATEST_RELEASE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`;
 
 const PLATFORMS: Record<Exclude<Platform, "unknown">, PlatformInfo> = {
   macos: {
     name: "macOS",
     icon: <Apple className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}.dmg`,
-    fileName: `Patchwork-${VERSION}.dmg`,
     requirements: ["macOS 11 (Big Sur) or later", "Apple Silicon or Intel processor", "4GB RAM minimum"],
   },
   windows: {
     name: "Windows",
     icon: <Monitor className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}-Setup.exe`,
-    fileName: `Patchwork-${VERSION}-Setup.exe`,
     requirements: ["Windows 10 or later", "64-bit processor", "4GB RAM minimum"],
   },
   linux: {
     name: "Linux",
     icon: <LinuxIcon className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}.AppImage`,
-    fileName: `Patchwork-${VERSION}.AppImage`,
     requirements: ["Ubuntu 20.04+ or equivalent", "64-bit processor", "4GB RAM minimum"],
   },
 };
@@ -80,7 +79,7 @@ function detectPlatform(): Platform {
 }
 
 interface DownloadButtonProps {
-  platform: PlatformInfo;
+  platform: PlatformInfo & PlatformDownload;
   isDetected?: boolean;
 }
 
@@ -163,10 +162,88 @@ function InstallationInstructions({ platform }: InstallationInstructionsProps) {
 
 export function DownloadSection() {
   const [detectedPlatform] = useState<Platform>(() => detectPlatform());
+  const [version, setVersion] = useState<string>("latest");
+  const [platformDownloads, setPlatformDownloads] = useState<Record<Exclude<Platform, "unknown">, PlatformDownload>>({
+    macos: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest macOS build",
+    },
+    windows: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest Windows build",
+    },
+    linux: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest Linux build",
+    },
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchLatestRelease() {
+      try {
+        const response = await fetch(GITHUB_API_LATEST_RELEASE_URL, {
+          headers: {
+            Accept: "application/vnd.github+json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`GitHub release request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const newVersion = (data.tag_name ?? data.name ?? "latest").replace(/^v/i, "");
+        const assets = Array.isArray(data.assets) ? data.assets : [];
+
+        const downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>> = {};
+
+        for (const asset of assets) {
+          const name: string = asset?.name ?? "";
+          const url: string | undefined = asset?.browser_download_url;
+          const lowerName = name.toLowerCase();
+
+          if (!url) continue;
+
+          if (lowerName.endsWith(".dmg") && !downloads.macos) {
+            downloads.macos = { downloadUrl: url, fileName: name };
+          } else if (lowerName.endsWith(".exe") && !downloads.windows) {
+            downloads.windows = { downloadUrl: url, fileName: name };
+          } else if ((lowerName.endsWith(".appimage") || lowerName.endsWith(".deb")) && !downloads.linux) {
+            downloads.linux = { downloadUrl: url, fileName: name };
+          }
+        }
+
+        if (!cancelled) {
+          setVersion(newVersion);
+          setPlatformDownloads((prev) => ({
+            macos: downloads.macos ?? prev.macos,
+            windows: downloads.windows ?? prev.windows,
+            linux: downloads.linux ?? prev.linux,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load latest FlowPatch release", error);
+      }
+    }
+
+    fetchLatestRelease();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const platformOrder: Exclude<Platform, "unknown">[] = detectedPlatform !== "unknown"
-    ? [detectedPlatform, ...Object.keys(PLATFORMS).filter((p) => p !== detectedPlatform) as Exclude<Platform, "unknown">[]]
+    ? [detectedPlatform, ...(Object.keys(PLATFORMS).filter((p) => p !== detectedPlatform) as Exclude<Platform, "unknown">[])]
     : ["macos", "windows", "linux"];
+
+  const platformList: Record<Exclude<Platform, "unknown">, PlatformInfo & PlatformDownload> = {
+    macos: { ...PLATFORMS.macos, ...platformDownloads.macos },
+    windows: { ...PLATFORMS.windows, ...platformDownloads.windows },
+    linux: { ...PLATFORMS.linux, ...platformDownloads.linux },
+  };
 
   return (
     <section className="w-full py-16 px-4 bg-background">
@@ -178,7 +255,7 @@ export function DownloadSection() {
             Get started with Patchwork on your preferred platform
           </p>
           <span className="inline-block px-3 py-1 text-sm font-medium bg-secondary text-secondary-foreground rounded-full">
-            Version {VERSION}
+            Version {version}
           </span>
         </div>
 
@@ -187,7 +264,7 @@ export function DownloadSection() {
           {platformOrder.map((platform) => (
             <DownloadButton
               key={platform}
-              platform={PLATFORMS[platform]}
+              platform={platformList[platform]}
               isDetected={platform === detectedPlatform}
             />
           ))}
