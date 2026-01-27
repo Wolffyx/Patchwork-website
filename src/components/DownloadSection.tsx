@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Download, Apple, Monitor, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,7 +7,7 @@ type Platform = "macos" | "windows" | "linux" | "unknown";
 
 interface PlatformInfo {
   name: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   requirements: string[];
 }
 
@@ -19,6 +20,18 @@ const REPO_OWNER = "Wolffyx";
 const REPO_NAME = "flowpatch";
 const GITHUB_RELEASES_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
 const GITHUB_API_LATEST_RELEASE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`;
+
+type GithubAsset = {
+  name?: string;
+  browser_download_url?: string;
+};
+
+const SKIP_ASSET_PATTERNS = [/blockmap/i, /\.yml$/i, /\.yaml$/i, /\.txt$/i, /\.sig$/i, /\.sha\d*/i];
+
+type AssetMatch = {
+  platform: Exclude<Platform, "unknown">;
+  priority: number;
+};
 
 const PLATFORMS: Record<Exclude<Platform, "unknown">, PlatformInfo> = {
   macos: {
@@ -76,6 +89,49 @@ function detectPlatform(): Platform {
   }
 
   return "unknown";
+}
+
+function classifyAsset(name: string): AssetMatch | null {
+  const normalized = name.toLowerCase();
+
+  // Quickly skip metadata/update helper artifacts
+  if (SKIP_ASSET_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return null;
+  }
+
+  if (normalized.endsWith(".dmg")) {
+    return { platform: "macos", priority: 1 };
+  }
+
+  if (normalized.endsWith(".zip") && (normalized.includes("mac") || normalized.includes("darwin") || normalized.includes("osx"))) {
+    return { platform: "macos", priority: 2 };
+  }
+
+  if (normalized.endsWith(".exe")) {
+    return { platform: "windows", priority: 1 };
+  }
+
+  if (normalized.endsWith(".msi")) {
+    return { platform: "windows", priority: 2 };
+  }
+
+  if (normalized.endsWith(".zip") && normalized.includes("win")) {
+    return { platform: "windows", priority: 3 };
+  }
+
+  if (normalized.endsWith(".appimage")) {
+    return { platform: "linux", priority: 1 };
+  }
+
+  if (normalized.endsWith(".deb")) {
+    return { platform: "linux", priority: 2 };
+  }
+
+  if (normalized.endsWith(".rpm") || normalized.endsWith(".tar.gz") || normalized.endsWith(".tar.xz")) {
+    return { platform: "linux", priority: 3 };
+  }
+
+  return null;
 }
 
 interface DownloadButtonProps {
@@ -186,6 +242,7 @@ export function DownloadSection() {
         const response = await fetch(GITHUB_API_LATEST_RELEASE_URL, {
           headers: {
             Accept: "application/vnd.github+json",
+            "User-Agent": "patchwork-website",
           },
         });
 
@@ -195,23 +252,23 @@ export function DownloadSection() {
 
         const data = await response.json();
         const newVersion = (data.tag_name ?? data.name ?? "latest").replace(/^v/i, "");
-        const assets = Array.isArray(data.assets) ? data.assets : [];
+        const assets: GithubAsset[] = Array.isArray(data.assets) ? data.assets : [];
 
         const downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>> = {};
+        const priorities: Partial<Record<Exclude<Platform, "unknown">, number>> = {};
 
         for (const asset of assets) {
-          const name: string = asset?.name ?? "";
-          const url: string | undefined = asset?.browser_download_url;
-          const lowerName = name.toLowerCase();
+          const name = asset?.name ?? "";
+          const url = asset?.browser_download_url;
+          if (!url || !name) continue;
 
-          if (!url) continue;
+          const match = classifyAsset(name);
+          if (!match) continue;
 
-          if (lowerName.endsWith(".dmg") && !downloads.macos) {
-            downloads.macos = { downloadUrl: url, fileName: name };
-          } else if (lowerName.endsWith(".exe") && !downloads.windows) {
-            downloads.windows = { downloadUrl: url, fileName: name };
-          } else if ((lowerName.endsWith(".appimage") || lowerName.endsWith(".deb")) && !downloads.linux) {
-            downloads.linux = { downloadUrl: url, fileName: name };
+          const currentPriority = priorities[match.platform] ?? Number.MAX_SAFE_INTEGER;
+          if (match.priority < currentPriority) {
+            priorities[match.platform] = match.priority;
+            downloads[match.platform] = { downloadUrl: url, fileName: name };
           }
         }
 
