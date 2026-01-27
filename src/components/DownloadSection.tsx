@@ -27,6 +27,7 @@ type GithubRelease = {
   name?: string;
   assets?: GithubAsset[];
   draft?: boolean;
+  prerelease?: boolean;
 };
 
 const SKIP_ASSET_PATTERNS = [
@@ -274,7 +275,23 @@ export function DownloadSection() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchRelease(url: string): Promise<GithubRelease | null> {
+    function applyRelease(
+      release: GithubRelease,
+      downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>>
+    ) {
+      setVersion(getVersionLabel(release));
+      setPlatformDownloads((prev) => ({
+        macos: downloads.macos ?? prev.macos,
+        windows: downloads.windows ?? prev.windows,
+        linux: downloads.linux ?? prev.linux,
+      }));
+    }
+
+    function hasDownloads(downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>>) {
+      return Boolean(downloads.macos || downloads.windows || downloads.linux);
+    }
+
+    async function fetchRelease(url: string): Promise<GithubRelease | GithubRelease[] | null> {
       try {
         const response = await fetch(url, {
           headers: {
@@ -288,14 +305,6 @@ export function DownloadSection() {
         }
 
         const data = await response.json();
-        if (Array.isArray(data)) {
-          return data.find((release) => release && !release.draft) ?? null;
-        }
-
-        if (data?.draft) {
-          return null;
-        }
-
         return data;
       } catch (error) {
         console.error("Failed to load FlowPatch release from", url, error);
@@ -304,25 +313,38 @@ export function DownloadSection() {
     }
 
     async function fetchLatestRelease() {
-      const releaseCandidates = [GITHUB_API_LATEST_RELEASE_URL, GITHUB_API_RELEASES_URL];
+      const latestReleaseResponse = await fetchRelease(GITHUB_API_LATEST_RELEASE_URL);
+      const latestRelease = Array.isArray(latestReleaseResponse)
+        ? latestReleaseResponse.find((release) => release && !release.draft && !release.prerelease)
+        : latestReleaseResponse;
 
-      for (const url of releaseCandidates) {
-        const release = await fetchRelease(url);
-        if (!release) continue;
+      if (latestRelease && !latestRelease.draft && !latestRelease.prerelease) {
+        const assets: GithubAsset[] = Array.isArray(latestRelease.assets) ? latestRelease.assets : [];
+        const downloads = buildPlatformDownloads(assets);
+
+        if (!cancelled) {
+          applyRelease(latestRelease, downloads);
+        }
+
+        if (hasDownloads(downloads)) {
+          return;
+        }
+      }
+
+      const releasesList = await fetchRelease(GITHUB_API_RELEASES_URL);
+      const releases = Array.isArray(releasesList) ? releasesList : releasesList ? [releasesList] : [];
+
+      for (const release of releases) {
+        if (!release || release.draft || release.prerelease) continue;
 
         const assets: GithubAsset[] = Array.isArray(release.assets) ? release.assets : [];
         const downloads = buildPlatformDownloads(assets);
 
         if (!cancelled) {
-          setVersion(getVersionLabel(release));
-          setPlatformDownloads((prev) => ({
-            macos: downloads.macos ?? prev.macos,
-            windows: downloads.windows ?? prev.windows,
-            linux: downloads.linux ?? prev.linux,
-          }));
+          applyRelease(release, downloads);
         }
 
-        if (downloads.macos || downloads.windows || downloads.linux) {
+        if (hasDownloads(downloads)) {
           return;
         }
       }
