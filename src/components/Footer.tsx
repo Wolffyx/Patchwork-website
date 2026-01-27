@@ -1,4 +1,5 @@
 import { Github, Twitter } from "lucide-react";
+import { GITHUB_BASE_URL } from "@/config/github";
 
 interface FooterLinkProps {
   href: string;
@@ -37,7 +38,7 @@ const footerLinks = {
     { href: "#docs", label: "Documentation" },
   ],
   resources: [
-    { href: "https://github.com/patchwork", label: "GitHub", external: true },
+    { href: GITHUB_BASE_URL, label: "GitHub", external: true },
     { href: "#docs", label: "Getting Started" },
     { href: "#docs", label: "API Reference" },
   ],
@@ -50,7 +51,7 @@ const footerLinks = {
 
 const socialLinks = [
   {
-    href: "https://github.com/patchwork",
+    href: GITHUB_BASE_URL,
     label: "GitHub",
     icon: Github,
   },

@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { Menu, X, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { GITHUB_BASE_URL } from "@/config/github";
 
 interface NavLinkProps {
   href: string;
@@ -42,7 +43,7 @@ const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#docs", label: "Docs" },
   { href: "#download", label: "Download" },
-  { href: "https://github.com/patchwork", label: "GitHub", external: true },
+  { href: GITHUB_BASE_URL, label: "GitHub", external: true },
 ];
 
 export function Navigation() {

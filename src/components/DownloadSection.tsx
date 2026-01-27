@@ -1,40 +1,64 @@
-import { useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Download, Apple, Monitor, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GITHUB_API_LATEST_RELEASE_URL, GITHUB_API_RELEASES_URL, GITHUB_RELEASES_URL } from "@/config/github";
 
 type Platform = "macos" | "windows" | "linux" | "unknown";
 
 interface PlatformInfo {
   name: string;
-  icon: React.ReactNode;
-  downloadUrl: string;
-  fileName: string;
+  icon: ReactNode;
   requirements: string[];
 }
 
-const VERSION = "1.0.0";
-const GITHUB_RELEASES_URL = "https://github.com/patchwork-project/patchwork/releases";
+interface PlatformDownload {
+  downloadUrl: string;
+  fileName: string;
+}
+
+type GithubAsset = {
+  name?: string;
+  browser_download_url?: string;
+};
+
+type GithubRelease = {
+  tag_name?: string;
+  name?: string;
+  assets?: GithubAsset[];
+  draft?: boolean;
+  prerelease?: boolean;
+};
+
+const SKIP_ASSET_PATTERNS = [
+  /blockmap/i,
+  /\.yml$/i,
+  /\.yaml$/i,
+  /\.txt$/i,
+  /\.sig$/i,
+  /\.sha\d*/i,
+  /source\s*code/i,
+];
+
+type AssetMatch = {
+  platform: Exclude<Platform, "unknown">;
+  priority: number;
+};
 
 const PLATFORMS: Record<Exclude<Platform, "unknown">, PlatformInfo> = {
   macos: {
     name: "macOS",
     icon: <Apple className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}.dmg`,
-    fileName: `Patchwork-${VERSION}.dmg`,
     requirements: ["macOS 11 (Big Sur) or later", "Apple Silicon or Intel processor", "4GB RAM minimum"],
   },
   windows: {
     name: "Windows",
     icon: <Monitor className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}-Setup.exe`,
-    fileName: `Patchwork-${VERSION}-Setup.exe`,
     requirements: ["Windows 10 or later", "64-bit processor", "4GB RAM minimum"],
   },
   linux: {
     name: "Linux",
     icon: <LinuxIcon className="w-5 h-5" />,
-    downloadUrl: `${GITHUB_RELEASES_URL}/download/v${VERSION}/Patchwork-${VERSION}.AppImage`,
-    fileName: `Patchwork-${VERSION}.AppImage`,
     requirements: ["Ubuntu 20.04+ or equivalent", "64-bit processor", "4GB RAM minimum"],
   },
 };
@@ -79,8 +103,77 @@ function detectPlatform(): Platform {
   return "unknown";
 }
 
+function classifyAsset(name: string): AssetMatch | null {
+  const normalized = name.toLowerCase();
+
+  // Quickly skip metadata/update helper artifacts
+  if (SKIP_ASSET_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return null;
+  }
+
+  if (normalized.endsWith(".dmg")) {
+    return { platform: "macos", priority: 1 };
+  }
+
+  if (normalized.endsWith(".zip") && (normalized.includes("mac") || normalized.includes("darwin") || normalized.includes("osx"))) {
+    return { platform: "macos", priority: 2 };
+  }
+
+  if (normalized.endsWith(".exe")) {
+    return { platform: "windows", priority: 1 };
+  }
+
+  if (normalized.endsWith(".msi")) {
+    return { platform: "windows", priority: 2 };
+  }
+
+  if (normalized.endsWith(".zip") && normalized.includes("win")) {
+    return { platform: "windows", priority: 3 };
+  }
+
+  if (normalized.endsWith(".appimage")) {
+    return { platform: "linux", priority: 1 };
+  }
+
+  if (normalized.endsWith(".deb")) {
+    return { platform: "linux", priority: 2 };
+  }
+
+  if (normalized.endsWith(".rpm") || normalized.endsWith(".tar.gz") || normalized.endsWith(".tar.xz")) {
+    return { platform: "linux", priority: 3 };
+  }
+
+  return null;
+}
+
+function buildPlatformDownloads(assets: GithubAsset[]) {
+  const downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>> = {};
+  const priorities: Partial<Record<Exclude<Platform, "unknown">, number>> = {};
+
+  for (const asset of assets) {
+    const name = asset?.name ?? "";
+    const url = asset?.browser_download_url;
+    if (!url || !name) continue;
+
+    const match = classifyAsset(name);
+    if (!match) continue;
+
+    const currentPriority = priorities[match.platform] ?? Number.MAX_SAFE_INTEGER;
+    if (match.priority < currentPriority) {
+      priorities[match.platform] = match.priority;
+      downloads[match.platform] = { downloadUrl: url, fileName: name };
+    }
+  }
+
+  return downloads;
+}
+
+function getVersionLabel(release: GithubRelease) {
+  return (release.tag_name ?? release.name ?? "latest").replace(/^v/i, "");
+}
+
 interface DownloadButtonProps {
-  platform: PlatformInfo;
+  platform: PlatformInfo & PlatformDownload;
   isDetected?: boolean;
 }
 
@@ -163,10 +256,118 @@ function InstallationInstructions({ platform }: InstallationInstructionsProps) {
 
 export function DownloadSection() {
   const [detectedPlatform] = useState<Platform>(() => detectPlatform());
+  const [version, setVersion] = useState<string>("latest");
+  const [platformDownloads, setPlatformDownloads] = useState<Record<Exclude<Platform, "unknown">, PlatformDownload>>({
+    macos: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest macOS build",
+    },
+    windows: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest Windows build",
+    },
+    linux: {
+      downloadUrl: `${GITHUB_RELEASES_URL}/latest`,
+      fileName: "Download latest Linux build",
+    },
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    function applyRelease(
+      release: GithubRelease,
+      downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>>
+    ) {
+      setVersion(getVersionLabel(release));
+      setPlatformDownloads((prev) => ({
+        macos: downloads.macos ?? prev.macos,
+        windows: downloads.windows ?? prev.windows,
+        linux: downloads.linux ?? prev.linux,
+      }));
+    }
+
+    function hasDownloads(downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>>) {
+      return Boolean(downloads.macos || downloads.windows || downloads.linux);
+    }
+
+    async function fetchRelease(url: string): Promise<GithubRelease | GithubRelease[] | null> {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        });
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Failed to load FlowPatch release from", url, error);
+        return null;
+      }
+    }
+
+    async function fetchLatestRelease() {
+      const latestReleaseResponse = await fetchRelease(GITHUB_API_LATEST_RELEASE_URL);
+      const latestRelease = Array.isArray(latestReleaseResponse)
+        ? latestReleaseResponse.find((release) => release && !release.draft && !release.prerelease)
+        : latestReleaseResponse;
+
+      if (latestRelease && !latestRelease.draft && !latestRelease.prerelease) {
+        const assets: GithubAsset[] = Array.isArray(latestRelease.assets) ? latestRelease.assets : [];
+        const downloads = buildPlatformDownloads(assets);
+
+        if (!cancelled) {
+          applyRelease(latestRelease, downloads);
+        }
+
+        if (hasDownloads(downloads)) {
+          return;
+        }
+      }
+
+      const releasesList = await fetchRelease(GITHUB_API_RELEASES_URL);
+      const releases = Array.isArray(releasesList) ? releasesList : releasesList ? [releasesList] : [];
+
+      for (const release of releases) {
+        if (!release || release.draft || release.prerelease) continue;
+
+        const assets: GithubAsset[] = Array.isArray(release.assets) ? release.assets : [];
+        const downloads = buildPlatformDownloads(assets);
+
+        if (!cancelled) {
+          applyRelease(release, downloads);
+        }
+
+        if (hasDownloads(downloads)) {
+          return;
+        }
+      }
+
+      console.error("Failed to find a FlowPatch release with downloadable assets");
+    }
+
+    fetchLatestRelease();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const platformOrder: Exclude<Platform, "unknown">[] = detectedPlatform !== "unknown"
-    ? [detectedPlatform, ...Object.keys(PLATFORMS).filter((p) => p !== detectedPlatform) as Exclude<Platform, "unknown">[]]
+    ? [detectedPlatform, ...(Object.keys(PLATFORMS).filter((p) => p !== detectedPlatform) as Exclude<Platform, "unknown">[])]
     : ["macos", "windows", "linux"];
+
+  const platformList: Record<Exclude<Platform, "unknown">, PlatformInfo & PlatformDownload> = {
+    macos: { ...PLATFORMS.macos, ...platformDownloads.macos },
+    windows: { ...PLATFORMS.windows, ...platformDownloads.windows },
+    linux: { ...PLATFORMS.linux, ...platformDownloads.linux },
+  };
 
   return (
     <section className="w-full py-16 px-4 bg-background">
@@ -178,7 +379,7 @@ export function DownloadSection() {
             Get started with Patchwork on your preferred platform
           </p>
           <span className="inline-block px-3 py-1 text-sm font-medium bg-secondary text-secondary-foreground rounded-full">
-            Version {VERSION}
+            Version {version}
           </span>
         </div>
 
@@ -187,7 +388,7 @@ export function DownloadSection() {
           {platformOrder.map((platform) => (
             <DownloadButton
               key={platform}
-              platform={PLATFORMS[platform]}
+              platform={platformList[platform]}
               isDetected={platform === detectedPlatform}
             />
           ))}

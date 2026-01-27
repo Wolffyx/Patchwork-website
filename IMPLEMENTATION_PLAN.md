@@ -1,67 +1,72 @@
-# Implementation Plan (AI execution failed)
+# Implementation Plan (AI execution unavailable)
 
 ## Task
-Build navigation and footer
+Fix download buttons with the right repo release
 
 ## Description
-Create consistent site-wide navigation header and footer components.
-
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
 ## Plan
 # Task: Implement the following issue
 
 ## Issue Title
-Build navigation and footer
+Fix download buttons with the right repo release
 
 ## Issue Description
-Create consistent site-wide navigation header and footer components.
-
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
 ## Implementation Plan
-# Implementation Plan (Lite)
+# Implementation Specification (Spec)
 
 ## Task
-Build navigation and footer
+Fix download buttons with the right repo release
 
 ## Description
-Create consistent site-wide navigation header and footer components.
+I would like to change the repo download to the repo app itself, the files are in the release page. Project url: https://github.com/Wolffyx/flowpatch
 
-## Acceptance Criteria
-- [ ] Sticky header with logo and nav links
-- [ ] Mobile hamburger menu
-- [ ] Links: Features, Docs, Download, GitHub
-- [ ] Footer with copyright, social links, and secondary navigation
-- [ ] Smooth scroll to sections on single-page navigation
+## Analysis Requirements
+Before implementing, analyze the following:
+1. Identify all files that need to be modified
+2. List any new files that need to be created
+3. Check for existing patterns in the codebase to follow
+4. Identify any dependencies or related components
 
-## Approach
-1. Analyze the requirements
-2. Identify files to modify
-3. Implement changes
-4. Run verification commands
-5. Commit and push
+## Implementation Steps
+1. **Preparation**
+   - Review existing code structure
+   - Identify integration points
 
-## Commands to Run
+2. **Core Changes**
+   - Implement the main functionality
+   - Follow existing code patterns and conventions
+
+3. **Integration**
+   - Wire up new components
+   - Update any necessary imports/exports
+
+4. **Testing**
+   - Add or update tests as needed
+   - Verify existing tests still pass
+
+## Verification
+- Lint: `pnpm lint`
+- Test: `pnpm test`
+- Build: `pnpm build`
+
+## Allowed Commands
 - pnpm install
 - pnpm lint
 - pnpm test
 - pnpm build
 
+## Forbidden Paths
+- .github/workflows/
+- .gitlab-ci.yml
+
 ## Important Constraints
 - Only use these commands: pnpm install, pnpm lint, pnpm test, pnpm build
 - Do NOT modify these paths: .github/workflows/, .gitlab-ci.yml
-- Working directory: D:\Projects\Typescript\React\Patchwork-website-worktrees\github-4-build-navigation-and-footer
+- Working directory: D:\Projects\Typescript\React\Patchwork-website-worktrees\github-23-fix-download-buttons-with-the-right-repo-release
 - Repo root: D:\Projects\Typescript\React\Patchwork-website
 - After implementation, run the verification commands if they exist
 
@@ -70,21 +75,18 @@ Create consistent site-wide navigation header and footer components.
 - Test: pnpm test
 - Build: pnpm build
 
-## Project Memory (from .patchwork)
+## Project Memory (from .flowpatch)
 ### AGENTS.md (top)
-# Patchwork Agent Notes
+# FlowPatch Agent Notes
 
 - Where things live:
 - Commands:
 - When asked X check Y:
-
 ### ARCHITECTURE.md (top)
 # Architecture
 
-
 ### Suggested files (from local index)
 (none)
-
 ### Snippets (bounded, may be redacted)
 (none)
 
@@ -98,8 +100,8 @@ Files modified:
 IMPLEMENTATION_PLAN.md
 
 Change summary:
-IMPLEMENTATION_PLAN.md | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+IMPLEMENTATION_PLAN.md | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 Continue from where you left off. Focus on the next logical step.
 
@@ -110,7 +112,7 @@ Continue from where you left off. Focus on the next logical step.
 - If you complete the current subtask, move to the next one
 
 
-## Error
-AI execution failed: spawn EINVAL
+## Note
+All AI providers failed. Tried: codex. Last error: Error: spawn D:\Projects\Typescript\React\Patchwork\node_modules\.bin\node.exe ENOENT
 
 Please implement the changes manually following the plan above.
