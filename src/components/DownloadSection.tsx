@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Download, Apple, Monitor, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GITHUB_API_LATEST_RELEASE_URL, GITHUB_RELEASES_URL } from "@/config/github";
 
 type Platform = "macos" | "windows" | "linux" | "unknown";
 
@@ -15,11 +16,6 @@ interface PlatformDownload {
   downloadUrl: string;
   fileName: string;
 }
-
-const REPO_OWNER = "Wolffyx";
-const REPO_NAME = "flowpatch";
-const GITHUB_RELEASES_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
-const GITHUB_API_LATEST_RELEASE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`;
 
 type GithubAsset = {
   name?: string;
