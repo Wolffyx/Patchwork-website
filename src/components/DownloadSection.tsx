@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Download, Apple, Monitor, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GITHUB_API_LATEST_RELEASE_URL, GITHUB_RELEASES_URL } from "@/config/github";
+import { GITHUB_API_LATEST_RELEASE_URL, GITHUB_API_RELEASES_URL, GITHUB_RELEASES_URL } from "@/config/github";
 
 type Platform = "macos" | "windows" | "linux" | "unknown";
 
@@ -20,6 +20,13 @@ interface PlatformDownload {
 type GithubAsset = {
   name?: string;
   browser_download_url?: string;
+};
+
+type GithubRelease = {
+  tag_name?: string;
+  name?: string;
+  assets?: GithubAsset[];
+  draft?: boolean;
 };
 
 const SKIP_ASSET_PATTERNS = [
@@ -138,6 +145,32 @@ function classifyAsset(name: string): AssetMatch | null {
   return null;
 }
 
+function buildPlatformDownloads(assets: GithubAsset[]) {
+  const downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>> = {};
+  const priorities: Partial<Record<Exclude<Platform, "unknown">, number>> = {};
+
+  for (const asset of assets) {
+    const name = asset?.name ?? "";
+    const url = asset?.browser_download_url;
+    if (!url || !name) continue;
+
+    const match = classifyAsset(name);
+    if (!match) continue;
+
+    const currentPriority = priorities[match.platform] ?? Number.MAX_SAFE_INTEGER;
+    if (match.priority < currentPriority) {
+      priorities[match.platform] = match.priority;
+      downloads[match.platform] = { downloadUrl: url, fileName: name };
+    }
+  }
+
+  return downloads;
+}
+
+function getVersionLabel(release: GithubRelease) {
+  return (release.tag_name ?? release.name ?? "latest").replace(/^v/i, "");
+}
+
 interface DownloadButtonProps {
   platform: PlatformInfo & PlatformDownload;
   isDetected?: boolean;
@@ -241,51 +274,60 @@ export function DownloadSection() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchLatestRelease() {
+    async function fetchRelease(url: string): Promise<GithubRelease | null> {
       try {
-        const response = await fetch(GITHUB_API_LATEST_RELEASE_URL, {
+        const response = await fetch(url, {
           headers: {
             Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
           },
         });
 
         if (!response.ok) {
-          throw new Error(`GitHub release request failed with status ${response.status}`);
+          return null;
         }
 
         const data = await response.json();
-        const newVersion = (data.tag_name ?? data.name ?? "latest").replace(/^v/i, "");
-        const assets: GithubAsset[] = Array.isArray(data.assets) ? data.assets : [];
-
-        const downloads: Partial<Record<Exclude<Platform, "unknown">, PlatformDownload>> = {};
-        const priorities: Partial<Record<Exclude<Platform, "unknown">, number>> = {};
-
-        for (const asset of assets) {
-          const name = asset?.name ?? "";
-          const url = asset?.browser_download_url;
-          if (!url || !name) continue;
-
-          const match = classifyAsset(name);
-          if (!match) continue;
-
-          const currentPriority = priorities[match.platform] ?? Number.MAX_SAFE_INTEGER;
-          if (match.priority < currentPriority) {
-            priorities[match.platform] = match.priority;
-            downloads[match.platform] = { downloadUrl: url, fileName: name };
-          }
+        if (Array.isArray(data)) {
+          return data.find((release) => release && !release.draft) ?? null;
         }
 
+        if (data?.draft) {
+          return null;
+        }
+
+        return data;
+      } catch (error) {
+        console.error("Failed to load FlowPatch release from", url, error);
+        return null;
+      }
+    }
+
+    async function fetchLatestRelease() {
+      const releaseCandidates = [GITHUB_API_LATEST_RELEASE_URL, GITHUB_API_RELEASES_URL];
+
+      for (const url of releaseCandidates) {
+        const release = await fetchRelease(url);
+        if (!release) continue;
+
+        const assets: GithubAsset[] = Array.isArray(release.assets) ? release.assets : [];
+        const downloads = buildPlatformDownloads(assets);
+
         if (!cancelled) {
-          setVersion(newVersion);
+          setVersion(getVersionLabel(release));
           setPlatformDownloads((prev) => ({
             macos: downloads.macos ?? prev.macos,
             windows: downloads.windows ?? prev.windows,
             linux: downloads.linux ?? prev.linux,
           }));
         }
-      } catch (error) {
-        console.error("Failed to load latest FlowPatch release", error);
+
+        if (downloads.macos || downloads.windows || downloads.linux) {
+          return;
+        }
       }
+
+      console.error("Failed to find a FlowPatch release with downloadable assets");
     }
 
     fetchLatestRelease();
