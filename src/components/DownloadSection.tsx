@@ -26,7 +26,15 @@ type GithubAsset = {
   browser_download_url?: string;
 };
 
-const SKIP_ASSET_PATTERNS = [/blockmap/i, /\.yml$/i, /\.yaml$/i, /\.txt$/i, /\.sig$/i, /\.sha\d*/i];
+const SKIP_ASSET_PATTERNS = [
+  /blockmap/i,
+  /\.yml$/i,
+  /\.yaml$/i,
+  /\.txt$/i,
+  /\.sig$/i,
+  /\.sha\d*/i,
+  /source\s*code/i,
+];
 
 type AssetMatch = {
   platform: Exclude<Platform, "unknown">;
@@ -242,7 +250,6 @@ export function DownloadSection() {
         const response = await fetch(GITHUB_API_LATEST_RELEASE_URL, {
           headers: {
             Accept: "application/vnd.github+json",
-            "User-Agent": "patchwork-website",
           },
         });
 
